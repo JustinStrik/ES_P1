@@ -11,14 +11,15 @@ from register import Register
 INM_has_token, INB_has_token, AIB_has_token, LIB_has_token, ADB_has_token, REB_has_token, RGF_has_token, DAM_has_token = True, False, False, False, False, False, False, False
 decode_has_token, read_has_token, ADDR_has_token, load_has_token, write_has_token, issue1_has_token, issue2_has_token, ALU_has_token = False, False, False, False, False, False, False, False
 
-INM = INM.INM()
-RGF = RGF.RGF()
-DAM = DAM.DAM()
-INB = INB.INB()
-AIB = AIB.AIB()
-LIB = LIB.LIB()
-ADB = ADB.ADB()
-REB = REB.REB()
+
+INM_ = INM.INM()
+RGF_ = RGF.RGF()
+DAM_ = DAM.DAM()
+INB_ = INB.INB()
+AIB_ = AIB.AIB()
+LIB_ = LIB.LIB()
+ADB_ = ADB.ADB()
+REB_ = REB.REB()
 global ADDR_var
 
 output = ''
@@ -44,14 +45,14 @@ def write_output():
     # DAM:<0,2>,<1,4>,<2,6>,<3,8>,<4,10>,<5,12>,<6,14>,<7,16>
     # to a file called simulation
     output = f'STEP {step}:\n'
-    output += f'{INM.get_INM_string()}\n'
-    output += f'{INB.get_INB_string()}\n'
-    output += f'{AIB.get_AIB_string()}\n'
-    output += f'{LIB.get_LIB_string()}\n'
-    output += f'{ADB.get_ADB_string()}\n'
-    output += f'{REB.get_REB_string()}\n'
-    output += f'{RGF.get_RGF_string()}\n'
-    output += f'{DAM.get_DAM_string()}\n'
+    output += f'{INM_.get_INM_string()}\n'
+    output += f'{INB_.get_INB_string()}\n'
+    output += f'{AIB_.get_AIB_string()}\n'
+    output += f'{LIB_.get_LIB_string()}\n'
+    output += f'{ADB_.get_ADB_string()}\n'
+    output += f'{REB_.get_REB_string()}\n'
+    output += f'{RGF_.get_RGF_string()}\n'
+    output += f'{DAM_.get_DAM_string()}\n'
     output += '\n'
 
     with open('simulation.txt', 'a') as file:
@@ -63,7 +64,7 @@ def decode():
     # above), and places the modified instruction token in INB.
 
     # remove first instruction from INM
-    instr = INM.pop()
+    instr = INM_.pop()
     # get the values of the source registers with the values from RGF
     # update the values of the source registers with the values from RGF
     # place the modified instruction token in INB
@@ -72,14 +73,14 @@ def decode():
     src1 = instr.src1
     src2 = instr.src2
     # get the values of the source registers with the values from RGF
-    src1_value = RGF.read(src1)
-    src2_value = RGF.read(src2)
+    src1_value = RGF_.read(src1)
+    src2_value = RGF_.read(src2)
 
     # update vals
     instr.src1 = src1_value
     instr.src2 = src2_value
 
-    INB.set_instr(instr)
+    INB_.set_instr(instr)
     INB_has_token = True
     # decode_has_token = False # left up to if theres vals left in INM
 
@@ -93,7 +94,7 @@ def ADDR():
     # The ADDR transition performs effective (data memory) address calculation for the load instruction by
     # adding the contents of two source registers. It produces a token as <destination-register-name, data memory
     # address> and places it in the address buffer (ADB).
-    ADDR_var = Register(LIB.instr.dest, LIB.instr.src1 + LIB.instr.src2)
+    ADDR_var = Register(LIB_.instr.dest, LIB_.instr.src1 + LIB_.instr.src2)
 
 def load():
     # The LOAD transition consumes a token from ADB and gets the data from the data memory for the
@@ -106,35 +107,37 @@ def write():
     # The WRITE transition transfers the result (one token) from the Result Buffer (REB) to the register file (RGF).
     # If there are more than one token in REB in a time step, the WRITE transition writes the token that belongs to
     # the in-order first instruction.
+    while (len(REB_.registers) > 0):
+        # register is name r[0-7], get the number
+        register = REB_.registers.pop()
+        RGF_.write(register.name, register.value)
     pass
 
 def issue1():
     # The ISSUE1 transition consumes one arithmetic/logical (ADD, SUB, AND, OR) instruction token (if any)
     # from INB and places it in the Arithmetic Instruction Buffer (AIB).
-    AIB.instr = INB.instr
-    INB_has_token, AIB_has_token = False, True
+    AIB_.instr = INB_.instr
 
 def issue2():
     # The ISSUE2 transition consumes one load (LD) instruction token (if any) from INB and places it in the Load
     # Instruction Buffer (LIB).
-    LIB.instr = INB.instr
-    INB_has_token, LIB_has_token = False, True
+    LIB_.instr = INB_.instr
 
 def ALU():
     # The ALU transition performs arithmetic/logical computations as per the instruction token from AIB, and
     # places the result in the result buffer (REB). The format of the token in result buffer is same as a token in RGF
     # i.e., <destination-register-name, value>.
-    
-    if (AIB.instr.opcode == 'ADD'):
-        return AIB.instr.src1 + AIB.instr.src2
-    elif (AIB.instr.opcode == 'SUB'):
-        return AIB.instr.src1 - AIB.instr.src2
-    elif (AIB.instr.opcode == 'AND'):
-        return AIB.instr.src1 & AIB.instr.src2
-    elif (AIB.instr.opcode == 'OR'):
-        return AIB.instr.src1 | AIB.instr.src2
 
+    if (AIB_.instr.opcode == 'ADD'):
+        REB_.instr.append(Register(AIB_.instr.dest, AIB_.instr.src1 + AIB_.instr.src2))
+    elif (AIB_.instr.opcode == 'SUB'):
+        REB_.instr.append(Register(AIB_.instr.dest, AIB_.instr.src1 - AIB_.instr.src2))
+    elif (AIB_.instr.opcode == 'AND'):
+        REB_.instr.append(Register(AIB_.instr.dest, AIB_.instr.src1 & AIB_.instr.src2))
+    elif (AIB_.instr.opcode == 'OR'):
+        REB_.instr.append(Register(AIB_.instr.dest, AIB_.instr.src1 | AIB_.instr.src2))
 
+    AIB_.instr = None
 # for i in instr:
 #     print(i)
 
@@ -198,8 +201,8 @@ while check_for_tokens():
         pass
     if read_has_token:
         pass
-    if write_has_token:
-        pass
+    if REB_has_token:
+        write()
     if load_has_token:
         pass
     if DAM_has_token:
@@ -210,31 +213,33 @@ while check_for_tokens():
         ADDR()
         pass
     if LIB_has_token:
-        ADDR_var = LIB.instr
+        ADDR_var = LIB_.instr 
         LIB_has_token = False
         ADDR_has_token = True
     if issue2_has_token:
         issue2_has_token = False
         LIB_has_token = True
-    if ALU_has_token:
+    if AIB_has_token:
         ALU()
-        ALU_has_token = False
+        AIB_has_token = False
         REB_has_token = True
     if issue1_has_token:
         issue1_has_token = False
         ALU_has_token = True
     if INB_has_token:
-        if (INB.is_instr_arith()):
+        if (INB_.is_instr_arith()):
             INB_has_token = False
             issue1()
+            INB_has_token, AIB_has_token = False, True
         else:
             INB_has_token = False
             issue2()
+            INB_has_token, LIB_has_token = False, True
     if decode_has_token:
         pass
     if INM_has_token:
         decode()
-        INM_has_token = not INM.is_empty()
+        INM_has_token = not INM_.is_empty()
         INB_has_token = True
 
     # write to simulation file
