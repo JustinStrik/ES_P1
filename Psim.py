@@ -111,12 +111,14 @@ def write():
 def issue1():
     # The ISSUE1 transition consumes one arithmetic/logical (ADD, SUB, AND, OR) instruction token (if any)
     # from INB and places it in the Arithmetic Instruction Buffer (AIB).
-    pass
+    AIB.instr = INB.instr
+    INB_has_token, AIB_has_token = False, True
 
 def issue2():
     # The ISSUE2 transition consumes one load (LD) instruction token (if any) from INB and places it in the Load
     # Instruction Buffer (LIB).
-    pass
+    LIB.instr = INB.instr
+    INB_has_token, LIB_has_token = False, True
 
 def ALU():
     # The ALU transition performs arithmetic/logical computations as per the instruction token from AIB, and
@@ -224,10 +226,10 @@ while check_for_tokens():
     if INB_has_token:
         if (INB.is_instr_arith()):
             INB_has_token = False
-            issue1_has_token = True
+            issue1()
         else:
             INB_has_token = False
-            issue2_has_token = True
+            issue2()
     if decode_has_token:
         pass
     if INM_has_token:
