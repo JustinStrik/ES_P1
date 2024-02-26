@@ -12,4 +12,4 @@ class AIB:
     def get_AIB_string(self):
         if self.instr is None:
             return 'AIB:'
-        return 'AIB:<' + self.instr.opcode + ',' + self.instr.dest + ',' + self.instr.src1 + ',' + self.instr.src2 + '>'
+        return 'AIB:<' + str(self.instr.opcode) + ',' + str(self.instr.dest) + ',' + str(self.instr.src1) + ',' + str(self.instr.src2) + '>'
