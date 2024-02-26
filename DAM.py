@@ -4,17 +4,42 @@
 # to initialize the data memory locations. You can assume that the content of a data memory location can vary
 # between 0 – 63
 
-def read_data_memory():
 
-    data_memory = []
-    with open('datamemory.txt'):
-        for line in open('datamemory.txt'):
-            line = line.strip()
-            line = line.replace('<', '')
-            line = line.replace('>', '')
-            line = line.split(',')
-            address = int(line[0])
-            value = int(line[1])
-            data_memory.append((address, value))
+class DAM:
 
-    return data_memory
+    locations = []
+
+    def __init__(self):
+        self.read_data_memory()
+
+    def __str__(self):
+        return f'{self.locations}'
+    
+    def read(self, address):
+        return self.locations[address][1]
+    
+    def read_data_memory(self):
+        # open datamemory.txt and read input in format
+        # <0,2>
+        # <1,4>
+        with open('datamemory.txt'):
+            for line in open('datamemory.txt'):
+                line = line.strip()
+                line = line.replace('<', '')
+                line = line.replace('>', '')
+                line = line.split(',')
+                address = int(line[0])
+                value = int(line[1])
+                self.locations.append((address, value))
+
+    def get_DAM_string(self):
+        # format: DAM:<0,2>,<1,4>,<2,6>,<3,8>,<4,10>,<5,12>,<6,14>,<7,16>
+        str = 'DAM:'
+        for i in range(len(self.locations)):
+            str += f'<{self.locations[i][0]},{self.locations[i][1]}>'
+            if i < len(self.locations) - 1:
+                str += ','
+        return str
+
+        
+    
