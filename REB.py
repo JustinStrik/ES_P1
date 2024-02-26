@@ -1,4 +1,4 @@
-import register
+from register import Register
 
 class REB:
     registers = []
@@ -7,5 +7,11 @@ class REB:
         pass
 
     def get_REB_string(self):
-        return 'REB:<' + ','.join([str(reg) for reg in self.registers]) + '>'
+        str = 'REB:'
+        for register in self.registers:
+            str += f'{register.name},{register.value}'
+            if register != self.registers[-1]:
+                str += ','
+        return str
+
             

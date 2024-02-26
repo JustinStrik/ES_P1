@@ -1,4 +1,4 @@
-import instruction
+from instruction import Instruction
 
 class AIB:
     instr = None
