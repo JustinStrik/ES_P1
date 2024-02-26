@@ -11,7 +11,7 @@ class ADB:
     
     def get_ADB_string(self):
         if self.instr is None:
-            return 'None'
+            return 'ADB:'
         return 'ADB:<' + self.instr.opcode + ',' + self.instr.dest + ',' + self.instr.src1 + ',' + self.instr.src2 + '>'
 
     # def load(self, instr):

@@ -11,7 +11,7 @@ class LIB:
     
     def get_LIB_string(self):
         if self.instr is None:
-            return 'None'
+            return 'LIB:'
         return 'LIB:<' + self.instr.opcode + ',' + self.instr.dest + ',' + self.instr.src1 + ',' + self.instr.src2 + '>'
 
     # def load(self, instr):
