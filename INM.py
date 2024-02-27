@@ -68,7 +68,9 @@ class INM:
         # return in format   # INM:<LD,R4,R2,R3>,<AND,R5,R2,R3>,<LD,R6,R2,R2>,<OR,R1,R3,R2>
         str = 'INM:'
         for instr in self.instructions:
-            str += f'<{instr.opcode},{instr.dest},{instr.src1},{instr.src2}>,'
+            str += f'<{instr.opcode},{instr.dest},{instr.src1},{instr.src2}>'
+            if instr != self.instructions[-1]:
+                str += ','
         return str
     
     def is_empty(self):
