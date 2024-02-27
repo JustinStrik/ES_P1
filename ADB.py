@@ -1,18 +1,15 @@
-import instruction
+from register import Register
 
 class ADB:
-    instr = None
+    reg = None
 
     def __init__(self):
         pass
-
-    def __str__(self):
-        return f'{self.instr}'
     
     def get_ADB_string(self):
-        if self.instr is None:
+        if self.reg is None:
             return 'ADB:'
-        return 'ADB:<' + str(self.instr.opcode) + ',' + str(self.instr.dest) + ',' + str(self.instr.src1) + ',' + str(self.instr.src2) + '>'
+        return 'ADB:<' + str(self.reg.name) + ',' + str(self.reg.value) + '>'
     
     # def load(self, instr):
     #     self.instr = instr

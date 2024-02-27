@@ -9,7 +9,7 @@ class REB:
     def get_REB_string(self):
         str = 'REB:'
         for register in self.registers:
-            str += f'{register.name},{register.value}'
+            str += f'<{register.name},{register.value}>'
             if register != self.registers[-1]:
                 str += ','
         return str
