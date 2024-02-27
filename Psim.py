@@ -107,6 +107,7 @@ def load():
     reg = Register(reg[0], reg[1])
     ADB_.reg = None
     REB_.registers.append(reg)
+    ADB_has_token = False
 
 def write():
     # The WRITE transition transfers the result (one token) from the Result Buffer (REB) to the register file (RGF).
@@ -212,11 +213,12 @@ while check_for_tokens():
     if REB_has_token:
         write()
     # if load_has_token:
-    #     pass
+    #     22pass
     if DAM_has_token:
         pass
     if ADB_has_token:
         load()
+        ADB_has_token = False
     if ADDR_has_token:
 
         pass
