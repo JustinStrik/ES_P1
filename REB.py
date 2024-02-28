@@ -13,5 +13,8 @@ class REB:
             if register != self.registers[-1]:
                 str += ','
         return str
+    
+    def is_empty(self):
+        return len(self.registers) == 0
 
             

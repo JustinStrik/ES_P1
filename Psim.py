@@ -79,6 +79,7 @@ def decode():
     instr.src2 = src2_value
 
     INB_.set_instr(instr)
+    global INB_has_token
     INB_has_token = True
     # decode_has_token = False # left up to if theres vals left in INM
 
@@ -107,17 +108,20 @@ def load():
     reg = Register(reg[0], reg[1])
     ADB_.reg = None
     REB_.registers.append(reg)
+    global ADB_has_token
     ADB_has_token = False
 
 def write():
     # The WRITE transition transfers the result (one token) from the Result Buffer (REB) to the register file (RGF).
     # If there are more than one token in REB in a time step, the WRITE transition writes the token that belongs to
     # the in-order first instruction.
-    while (len(REB_.registers) > 0):
-        # register is name r[0-7], get the number
-        register = REB_.registers.pop()
-        RGF_.write(register.name, register.value)
-    pass
+    register = REB_.registers.pop(0)
+    RGF_.write(register.name, register.value)
+
+    global REB_has_token
+    if REB_.is_empty():
+        REB_has_token = False
+    
 
 def issue1():
     # The ISSUE1 transition consumes one arithmetic/logical (ADD, SUB, AND, OR) instruction token (if any)
