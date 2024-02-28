@@ -1,24 +1,244 @@
-import INM
-import RGF
-import DAM
-import INB
-import AIB
-import LIB
-import ADB
-import REB
-from register import Register
+from enum import Enum
+
+class OPCODE(Enum):
+    ADD = 1
+    SUB = 2
+    AND = 3
+    OR = 4
+    LD = 5
+    
+class Instruction:
+    def __init__(self, opcode, dest, src1, src2):
+        self.opcode = opcode
+        self.dest = dest
+        self.src1 = src1
+        self.src2 = src2
+
+    def __str__(self):
+        return f'{self.opcode}, {self.dest}, {self.src1}, {self.src2}'
+    
+class Register:
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+    def __str__(self):
+        return f'<{self.name}, {self.value}>'
+    
+
+class ADB:
+    reg = None
+
+    def __init__(self):
+        pass
+    
+    def get_ADB_string(self):
+        if self.reg is None:
+            return 'ADB:'
+        return 'ADB:<' + str(self.reg.name) + ',' + str(self.reg.value) + '>'
+    
+class AIB:
+    instr = None
+
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return f'{self.instr}'
+    
+    def get_AIB_string(self):
+        if self.instr is None:
+            return 'AIB:'
+        return 'AIB:<' + str(self.instr.opcode) + ',' + str(self.instr.dest) + ',' + str(self.instr.src1) + ',' + str(self.instr.src2) + '>'
+    
+class DAM:
+
+    locations = []
+
+    def __init__(self):
+        self.read_data_memory()
+
+    def __str__(self):
+        return f'{self.locations}'
+    
+    def read(self, address):
+        return self.locations[address][1]
+    
+    def read_data_memory(self):
+        # open datamemory.txt and read input in format
+        # <0,2>
+        # <1,4>
+        with open('datamemory.txt'):
+            for line in open('datamemory.txt'):
+                line = line.strip()
+                line = line.replace('<', '')
+                line = line.replace('>', '')
+                line = line.split(',')
+                address = int(line[0])
+                value = int(line[1])
+                self.locations.append((address, value))
+
+    def get_DAM_string(self):
+        # format: DAM:<0,2>,<1,4>,<2,6>,<3,8>,<4,10>,<5,12>,<6,14>,<7,16>
+        str = 'DAM:'
+        for i in range(len(self.locations)):
+            str += f'<{self.locations[i][0]},{self.locations[i][1]}>'
+            if i < len(self.locations) - 1:
+                str += ','
+        return str  
+
+class INB:
+    instr = None
+
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return f'{self.instr}'
+    
+    def get_INB_string(self):
+        if self.instr is None:
+            return 'INB:'
+        return 'INB:<' + str(self.instr.opcode) + ',' + str(self.instr.dest) + ',' + str(self.instr.src1) + ',' + str(self.instr.src2) + '>'
+
+    def is_instr_arith(self):
+        # if instr is AND, OR, ADD, SUB
+        if (self.instr.opcode == 'ADD' or self.instr.opcode == 'SUB' or self.instr.opcode == 'AND' or self.instr.opcode == 'OR'):
+            return True
+        return False
+        
+    def set_instr(self, instr):
+        self.instr = instr
+        return self.instr
+    
+
+class INM:
+    instructions = []
+    
+    def __init__(self):
+        self.read_instructions()
+
+    def __str__(self):
+        return f'{self.instructions}'
+
+    def read_instructions(self):
+        # open instructions.txt and read input in format
+        # <ADD,R1,R2,R3>
+        # <LD,R4,R2,R3>
+        with open('instructions.txt'):
+            for line in open('instructions.txt'):
+                line = line.strip()
+                line = line.replace('<', '')
+                line = line.replace('>', '')
+                line = line.split(',')
+                opcode = line[0]
+                dest = line[1]
+                src1 = line[2]
+                src2 = line[3]
+                self.instructions.append(Instruction(opcode, dest, src1, src2))
+
+    def pop(self):
+        return self.instructions.pop(0)
+    
+    def get_INM_string(self):
+        # return in format   # INM:<LD,R4,R2,R3>,<AND,R5,R2,R3>,<LD,R6,R2,R2>,<OR,R1,R3,R2>
+        str = 'INM:'
+        for instr in self.instructions:
+            str += f'<{instr.opcode},{instr.dest},{instr.src1},{instr.src2}>'
+            if instr != self.instructions[-1]:
+                str += ','
+        return str
+    
+    def is_empty(self):
+        return len(self.instructions) == 0
+
+class LIB:
+    instr = None
+
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return f'{self.instr}'
+    
+    def get_LIB_string(self):
+        if self.instr is None:
+            return 'LIB:'
+        return 'LIB:<' + str(self.instr.opcode) + ',' + str(self.instr.dest) + ',' + str(self.instr.src1) + ',' + str(self.instr.src2) + '>'
+
+class REB:
+    registers = []
+
+    def __init__(self):
+        pass
+
+    def get_REB_string(self):
+        str = 'REB:'
+        for register in self.registers:
+            str += f'<{register.name},{register.value}>'
+            if register != self.registers[-1]:
+                str += ','
+        return str
+    
+    def is_empty(self):
+        return len(self.registers) == 0
+    
+
+class RGF:
+    registers = []
+
+    def __init__(self):
+        self.read_registers()
+    
+    def __str__(self):
+        return f'{self.registers}'
+    
+    def read(self, register):
+        for reg in self.registers:
+            if reg.name == register:
+                return reg.value
+    
+    def write(self, register, value):
+        for reg in self.registers:
+            if reg.name == register:
+                reg.value = value
+                return reg.value
+            
+    def read_registers(self):
+        with open('registers.txt'):
+            for line in open('registers.txt'):
+                line = line.strip()
+                line = line.replace('<', '')
+                line = line.replace('>', '')
+                line = line.split(',')
+                name = line[0]
+                value = int(line[1])
+                self.registers.append(Register(name, value))
+
+    def get_RGF_string(self):
+        # format     # RGF:<R0,4>,<R1,3>,<R2,2>,<R3,1>,<R4,4>,<R5,3>,<R6,2>,<R7,1>
+
+        str = 'RGF:'
+        for i in range(len(self.registers)):
+            str += f'<{self.registers[i].name},{self.registers[i].value}>'
+            if i < len(self.registers) - 1:
+                str += ','
+
+        return str
+
+
 
 INM_has_token, INB_has_token, AIB_has_token, LIB_has_token, ADB_has_token, REB_has_token, RGF_has_token, DAM_has_token = True, False, False, False, False, False, False, False
 decode_has_token, read_has_token, ADDR_has_token, load_has_token, write_has_token, issue1_has_token, issue2_has_token, ALU_has_token = False, False, False, False, False, False, False, False
 
-INM_ = INM.INM()
-RGF_ = RGF.RGF()
-DAM_ = DAM.DAM()
-INB_ = INB.INB()
-AIB_ = AIB.AIB()
-LIB_ = LIB.LIB()
-ADB_ = ADB.ADB()
-REB_ = REB.REB()
+INM_ = INM()
+RGF_ = RGF()
+DAM_ = DAM()
+INB_ = INB()
+AIB_ = AIB()
+LIB_ = LIB()
+ADB_ = ADB()
+REB_ = REB()
 
 output = ''
 step = 0 # for counting steps in the simulation
