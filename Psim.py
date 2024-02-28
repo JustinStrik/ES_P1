@@ -206,7 +206,6 @@ write_output()
 step += 1
 
 while check_for_tokens():
-
     # change order to RGF, read, write, load, DAM, ADB, ADDR, LIB, Issue2, ALU, issue1, INB, decode, INM
     # keep blocks of code for each if as written, just change order
     if RGF_has_token:
@@ -223,6 +222,7 @@ while check_for_tokens():
     if ADB_has_token:
         load()
         ADB_has_token = False
+        REB_has_token = True
     if ADDR_has_token:
 
         pass
